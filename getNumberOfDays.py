@@ -24,7 +24,7 @@ def fetch_user_input ():
 	#Prompt user for Name
 	user_name = input("Please enter your name : ")
 	#Prompt user for DoB
-	user_dob = input("Please enter your Date of Birth in format - MM/DD/YYY  : ")
+	user_dob_str = input("Please enter your Date of Birth in format - MM/DD/YYY  : ")
 	#Initializing flags
 	is_input_correct=False
 	attempt_number=1
@@ -34,16 +34,18 @@ def fetch_user_input ():
 	while not is_input_correct and user_quit!=1:
 		#Validate the input arguments
 		try:
-			valid_date = time.strptime(user_dob, '%m/%d/%Y')
+			user_dob = dt.datetime.strptime(user_dob_str, '%m/%d/%Y').date()
 			is_input_correct=True
 		except Exception as e:
 			if attempt_number < 4:
-				print('uh-oh! Looks like you entered a wrong date \n\n\t {} try entering your birthdate in the format - MM/DD/YYYY'.format(user_name+','))
-				user_dob=input("Date of Birth : ")
+				#Check number of attempts. Continue asking for input until number of attempts > 3
+				print('uh-oh! Looks like you entered a wrong date \n\n\t {}, try entering your birthdate in the format - MM/DD/YYYY'.format(user_name or 'Sorry did not get your name but'))
+				user_dob_str=input("Date of Birth : ")
 				attempt_number+=1
 				is_input_correct=False
 				continue
 			else:
+				#When number of attempts > 3
 				print ('Hmm... Looks like you things are just not going right.. Do you want to quit now and try again?')
 				user_quit=int(input('Enter 1 for quit or any other number to continue : '))
 				if user_quit != 1:
@@ -52,13 +54,24 @@ def fetch_user_input ():
 	
 	#Return the input arguments back
 	if user_quit!=1:
-		return [user_name,valid_date]
+		return [user_name,user_dob]
 	else:
 		return None
 
+def calculate_age(user_dob):
+	#print(type(user_dob))
+	current_date=dt.date.today()
+	time_difference=current_date-user_dob
+	return time_difference.days
 
 
+print ('***WELCOME TO THE AGE CALCULATOR***')
 user_input=fetch_user_input()
+if user_input:
+	age=calculate_age(user_input[1])
+	print('Hey {}... Your age in days is {} '.format(user_input[0] or 'Sorry did not get your name but',age))
+
+print('Thanks for using the Age calculator!!!')
 
 #print(user_input)
 
